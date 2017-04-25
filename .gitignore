@@ -1,0 +1,6 @@
+/.cache/
+/.coverage
+/.idea/
+/*.iml
+*.pyc
+/htmlcov/
