@@ -7,10 +7,12 @@ import subprocess
 from typing import Dict  # noqa
 from typing import Generic
 from typing import List  # noqa
+from typing import Mapping
 from typing import Optional
 from typing import Sequence
 from typing import Tuple
 from typing import TypeVar
+from typing import cast
 
 IGNORED = '\033[38;5;244m? '
 REMOVE = '\033[31m< '
@@ -161,7 +163,11 @@ def main(argv: Optional[Sequence[str]]) -> None:
             dconf_section = dconf_config[section]
             # But it might be managed at a higher level, so it might not be in desired_config.
             # In that case we'll end up resetting everything.
-            desired_section = desired_config[section] if section in desired_config else {}
+            desired_section = (
+                desired_config[section]
+                if section in desired_config else
+                cast(Mapping, {})
+            )
             for option in sorted(set(dconf_section.keys()) | set(desired_section.keys())):
                 if option not in dconf_section:
                     write(section, option, desired_section[option], args.apply)
