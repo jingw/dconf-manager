@@ -4,3 +4,4 @@
 /*.iml
 *.pyc
 /htmlcov/
+/.mypy_cache/
