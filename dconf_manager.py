@@ -4,9 +4,9 @@ import configparser
 import posixpath
 import subprocess
 
-from typing import Dict  # noqa
+from typing import Dict
 from typing import Generic
-from typing import List  # noqa
+from typing import List
 from typing import Mapping
 from typing import Optional
 from typing import Sequence
