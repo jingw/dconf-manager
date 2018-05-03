@@ -1,5 +1,5 @@
 mypy
-pytest>=3.1
+pytest
 pytest-cov
 pytest-flake8
 pytest-random
