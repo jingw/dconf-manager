@@ -1,7 +1,7 @@
-sudo: false
+dist: xenial
 language: python
 python:
-  - "3.6"
+  - "3.7"
 before_install: pip install codecov
 install: pip install --upgrade -r dev_requirements.txt
 script: mypy *.py && PYTHONHASHSEED=random pytest
