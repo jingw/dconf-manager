@@ -22,6 +22,7 @@ EXPECTED_OUTPUT_WITH_IGNORED = """\
 \033[32m> add/AddedKey=1
 \033[38;5;244m? clear/keep=5
 \033[31m< clear/foo/bar/blah=50
+\033[38;5;244m? clear/foo/bar/exclude/no=1
 \033[38;5;244m? clear/food/hi=1
 \033[38;5;244m? ignored/a=1
 \033[31m< overwrite/a=1
@@ -108,6 +109,8 @@ class TestDconfManager(unittest.TestCase):
         keep=5
         [clear/foo/bar]
         blah=50
+        [clear/foo/bar/exclude]
+        no=1
         [clear/food]
         hi=1
         """)

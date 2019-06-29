@@ -30,6 +30,10 @@ class HierarchicalSet(Generic[T]):
     """A set of paths [a, b, c, ...]
 
     The root is represented by [].
+
+    Adding a path X causes all paths starting with X to be part of the set.
+    For example, adding "a" causes "a/b" to be a member.
+    However, adding "a/b" does not cause "a" to be a member.
     """
 
     def __init__(self) -> None:
@@ -144,20 +148,31 @@ def main(argv: Optional[Sequence[str]]) -> None:
     for f in args.config:
         desired_config.read_file(f)
 
+    # excluded sections override managed sections
     managed_sections = HierarchicalSet[str]()
+    excluded_sections = HierarchicalSet[str]()
     for section in desired_config:
-        managed_sections.add(section.split('/'))
+        if section.startswith('-'):
+            excluded_sections.add(section[1:].split('/'))
+        else:
+            managed_sections.add(section.split('/'))
 
-    for section in sorted(set(dconf_config.keys()) | set(desired_config.keys())):
-        if section not in dconf_config:
-            # Adding a new section.
-            for option, value in desired_config[section].items():
-                write(section, option, value, args.apply)
-        elif section.split('/') not in managed_sections:
+    sections_union = sorted(
+        set(dconf_config.keys())
+        | set(k for k in desired_config.keys() if not k.startswith('-'))
+    )
+
+    for section in sections_union:
+        section_parts = section.split('/')
+        if section_parts in excluded_sections or section_parts not in managed_sections:
             # Section is not managed at all.
             if args.show_ignored:
                 for option, value in dconf_config[section].items():
                     print(IGNORED + format_kv(section, option, value))
+        elif section not in dconf_config:
+            # Adding a new section.
+            for option, value in desired_config[section].items():
+                write(section, option, value, args.apply)
         else:
             # Section is present and managed, so diff at option level.
             dconf_section = dconf_config[section]
