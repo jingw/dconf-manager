@@ -4,5 +4,5 @@ python:
   - "3.7"
 before_install: pip install codecov
 install: pip install --upgrade -r dev_requirements.txt
-script: mypy *.py && PYTHONHASHSEED=random pytest
+script: PYTHONHASHSEED=random pytest
 after_success: codecov

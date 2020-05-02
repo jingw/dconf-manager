@@ -44,5 +44,5 @@ Python 3 is required.
 
 ```
 pip install -r dev_requirements.txt
-mypy *.py && py.test
+pytest
 ```

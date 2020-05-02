@@ -189,7 +189,7 @@ def main(argv: Optional[Sequence[str]]) -> None:
             desired_section = (
                 desired_config[section]
                 if section in desired_config
-                else cast(Mapping, {})
+                else cast(Mapping[str, str], {})
             )
             for option in sorted(
                 set(dconf_section.keys()) | set(desired_section.keys())

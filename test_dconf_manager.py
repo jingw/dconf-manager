@@ -111,7 +111,7 @@ class TestDconfManager(unittest.TestCase):
         reset: mock.Mock,
         write: mock.Mock,
         dump: mock.Mock,
-    ) -> Tuple[List[tuple], List[tuple], str]:
+    ) -> Tuple[List[Tuple[object, ...]], List[Tuple[object, ...]], str]:
         config = textwrap.dedent(
             """\
         [ignored]
@@ -175,3 +175,6 @@ class TestTools(unittest.TestCase):
 
     def test_flake8(self) -> None:
         subprocess.check_call(["flake8"], cwd=os.path.dirname(__file__))
+
+    def test_mypy(self) -> None:
+        subprocess.check_call(["mypy", os.path.dirname(__file__)])
