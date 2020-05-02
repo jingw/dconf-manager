@@ -1,9 +1,8 @@
 import io
+import os
 import subprocess
 import textwrap
 import unittest
-
-import os
 from typing import List
 from typing import Tuple
 from unittest import mock
@@ -175,6 +174,9 @@ class TestTools(unittest.TestCase):
 
     def test_flake8(self) -> None:
         subprocess.check_call(["flake8"], cwd=os.path.dirname(__file__))
+
+    def test_isort(self) -> None:
+        subprocess.check_call(["isort", "--check-only"], cwd=os.path.dirname(__file__))
 
     def test_mypy(self) -> None:
         subprocess.check_call(["mypy", os.path.dirname(__file__)])
