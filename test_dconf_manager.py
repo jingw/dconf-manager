@@ -1,4 +1,5 @@
 import io
+import subprocess
 import textwrap
 import unittest
 
@@ -152,3 +153,8 @@ class TestDconfManager(unittest.TestCase):
             mock.call('/the/root/overwrite/b'),
         ]
         assert stdout == EXPECTED_OUTPUT
+
+
+class TestTools(unittest.TestCase):
+    def test_flake8(self) -> None:
+        subprocess.check_call(['flake8'], cwd=os.path.dirname(__file__))
