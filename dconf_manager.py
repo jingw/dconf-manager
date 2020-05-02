@@ -14,16 +14,16 @@ from typing import Tuple
 from typing import TypeVar
 from typing import cast
 
-IGNORED = '\033[38;5;244m? '
-REMOVE = '\033[31m< '
-ADD = '\033[32m> '
+IGNORED = "\033[38;5;244m? "
+REMOVE = "\033[31m< "
+ADD = "\033[32m> "
 
 
 def format_kv(section: str, option: str, value: str) -> str:
-    return posixpath.join(section, option) + '=' + value
+    return posixpath.join(section, option) + "=" + value
 
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class HierarchicalSet(Generic[T]):
@@ -86,23 +86,23 @@ class HierarchicalSet(Generic[T]):
         parts = []
         for level, item in self._expand_tree():
             if item is None:
-                parts.append('  ' * level + '*')
+                parts.append("  " * level + "*")
             else:
-                parts.append('  ' * level + str(item))
-        return '\n'.join(parts)
+                parts.append("  " * level + str(item))
+        return "\n".join(parts)
 
 
 def dconf_dump(root: str) -> str:
-    output: bytes = subprocess.check_output(['dconf', 'dump', root])
+    output: bytes = subprocess.check_output(["dconf", "dump", root])
     return output.decode()
 
 
 def dconf_write(key: str, value: str) -> None:
-    subprocess.check_call(['dconf', 'write', key, value])
+    subprocess.check_call(["dconf", "write", key, value])
 
 
 def dconf_reset(key: str) -> None:
-    subprocess.check_call(['dconf', 'reset', key])
+    subprocess.check_call(["dconf", "reset", key])
 
 
 class ConfigParser(configparser.ConfigParser):
@@ -114,17 +114,25 @@ class ConfigParser(configparser.ConfigParser):
 
 
 def main(argv: Optional[Sequence[str]]) -> None:
-    parser = argparse.ArgumentParser(
-        description="Tool for managing dconf settings",
+    parser = argparse.ArgumentParser(description="Tool for managing dconf settings",)
+    parser.add_argument(
+        "-a",
+        "--apply",
+        default=False,
+        action="store_true",
+        help="if not passed, only show a diff",
     )
-    parser.add_argument('-a', '--apply', default=False, action='store_true',
-                        help='if not passed, only show a diff')
-    parser.add_argument('config', type=open, nargs='+',
-                        help='INI files to load')
-    parser.add_argument('--root', default='/',
-                        help='all actions will be relative to this root')
-    parser.add_argument('-i', '--show-ignored', default=False, action='store_true',
-                        help='if true, print unmanaged options')
+    parser.add_argument("config", type=open, nargs="+", help="INI files to load")
+    parser.add_argument(
+        "--root", default="/", help="all actions will be relative to this root"
+    )
+    parser.add_argument(
+        "-i",
+        "--show-ignored",
+        default=False,
+        action="store_true",
+        help="if true, print unmanaged options",
+    )
     args = parser.parse_args(argv)
 
     root = args.root
@@ -152,18 +160,18 @@ def main(argv: Optional[Sequence[str]]) -> None:
     managed_sections = HierarchicalSet[str]()
     excluded_sections = HierarchicalSet[str]()
     for section in desired_config:
-        if section.startswith('-'):
-            excluded_sections.add(section[1:].split('/'))
+        if section.startswith("-"):
+            excluded_sections.add(section[1:].split("/"))
         else:
-            managed_sections.add(section.split('/'))
+            managed_sections.add(section.split("/"))
 
     sections_union = sorted(
         set(dconf_config.keys())
-        | set(k for k in desired_config.keys() if not k.startswith('-'))
+        | set(k for k in desired_config.keys() if not k.startswith("-"))
     )
 
     for section in sections_union:
-        section_parts = section.split('/')
+        section_parts = section.split("/")
         if section_parts in excluded_sections or section_parts not in managed_sections:
             # Section is not managed at all.
             if args.show_ignored:
@@ -180,10 +188,12 @@ def main(argv: Optional[Sequence[str]]) -> None:
             # In that case we'll end up resetting everything.
             desired_section = (
                 desired_config[section]
-                if section in desired_config else
-                cast(Mapping, {})
+                if section in desired_config
+                else cast(Mapping, {})
             )
-            for option in sorted(set(dconf_section.keys()) | set(desired_section.keys())):
+            for option in sorted(
+                set(dconf_section.keys()) | set(desired_section.keys())
+            ):
                 if option not in dconf_section:
                     write(section, option, desired_section[option], args.apply)
                 elif option not in desired_section:
@@ -196,5 +206,5 @@ def main(argv: Optional[Sequence[str]]) -> None:
                     pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main(None)
