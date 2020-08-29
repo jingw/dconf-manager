@@ -113,7 +113,9 @@ class ConfigParser(configparser.ConfigParser):
 
 
 def main(argv: Optional[Sequence[str]]) -> None:
-    parser = argparse.ArgumentParser(description="Tool for managing dconf settings",)
+    parser = argparse.ArgumentParser(
+        description="Tool for managing dconf settings",
+    )
     parser.add_argument(
         "-a",
         "--apply",
