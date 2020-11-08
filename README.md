@@ -37,7 +37,7 @@ See `--help` for more.
 Development
 ===========
 
-[![Build Status](https://travis-ci.org/jingw/dconf-manager.svg?branch=master)](https://travis-ci.org/jingw/dconf-manager)
+[![CI](https://github.com/jingw/shellquery/workflows/CI/badge.svg)](https://github.com/jingw/shellquery/actions?query=workflow%3ACI)
 [![codecov](https://codecov.io/gh/jingw/dconf-manager/branch/master/graph/badge.svg)](https://codecov.io/gh/jingw/dconf-manager)
 
 Python 3 is required.
