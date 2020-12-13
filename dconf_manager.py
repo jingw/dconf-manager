@@ -156,6 +156,7 @@ def main(argv: Optional[Sequence[str]]) -> None:
     desired_config = ConfigParser()
     for f in args.config:
         desired_config.read_file(f)
+        f.close()
 
     # excluded sections override managed sections
     managed_sections = HierarchicalSet[str]()
