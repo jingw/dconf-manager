@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import argparse
 import configparser
 import posixpath
 import subprocess
-from typing import Dict
 from typing import Generic
-from typing import List
-from typing import Mapping
-from typing import Optional
 from typing import Sequence
-from typing import Tuple
 from typing import TypeVar
 from typing import cast
 
@@ -37,7 +34,7 @@ class HierarchicalSet(Generic[T]):
 
     def __init__(self) -> None:
         """Create an empty set"""
-        self._children: Optional[Dict[T, HierarchicalSet[T]]] = {}
+        self._children: dict[T, HierarchicalSet[T]] | None = {}
         # Map from child to HierarchicalSet.
         # If empty, this set is empty.
         # If None, this set contains all children.
@@ -70,11 +67,11 @@ class HierarchicalSet(Generic[T]):
         else:
             return self._children is None
 
-    def _expand_tree(self) -> Sequence[Tuple[int, Optional[T]]]:
+    def _expand_tree(self) -> Sequence[tuple[int, T | None]]:
         if self._children is None:
             return [(0, None)]
         else:
-            result: List[Tuple[int, Optional[T]]] = []
+            result: list[tuple[int, T | None]] = []
             for k, v in sorted(self._children.items()):
                 result.append((0, k))
                 for level, item in v._expand_tree():
@@ -112,7 +109,7 @@ class ConfigParser(configparser.ConfigParser):
         return optionstr
 
 
-def main(argv: Optional[Sequence[str]]) -> None:
+def main(argv: Sequence[str] | None) -> None:
     parser = argparse.ArgumentParser(
         description="Tool for managing dconf settings",
     )
@@ -191,7 +188,7 @@ def main(argv: Optional[Sequence[str]]) -> None:
             desired_section = (
                 desired_config[section]
                 if section in desired_config
-                else cast(Mapping[str, str], {})
+                else cast(dict[str, str], {})
             )
             for option in sorted(
                 set(dconf_section.keys()) | set(desired_section.keys())

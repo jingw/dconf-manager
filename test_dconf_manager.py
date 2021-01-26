@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import io
 import os
 import subprocess
 import textwrap
 import unittest
 from typing import Sequence
-from typing import Tuple
 from unittest import mock
 
 from dconf_manager import HierarchicalSet
@@ -110,7 +111,7 @@ class TestDconfManager(unittest.TestCase):
         reset: mock.Mock,
         write: mock.Mock,
         dump: mock.Mock,
-    ) -> Tuple[Sequence[Tuple[object, ...]], Sequence[Tuple[object, ...]], str]:
+    ) -> tuple[Sequence[tuple[object, ...]], Sequence[tuple[object, ...]], str]:
         config = textwrap.dedent(
             """\
         [ignored]
