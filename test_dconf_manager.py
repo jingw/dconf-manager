@@ -3,7 +3,6 @@ from __future__ import annotations
 import io
 import os
 import textwrap
-import unittest
 from collections.abc import Sequence
 from unittest import mock
 
@@ -32,137 +31,139 @@ EXPECTED_OUTPUT_WITH_IGNORED = """\
 """
 
 
-class TestDconfManager(unittest.TestCase):
-    def test_hierarchical_set(self) -> None:
-        s = HierarchicalSet[int]()
-        assert str(s) == ""
-        assert [] not in s
-        assert [0] not in s
+def test_hierarchical_set() -> None:
+    s = HierarchicalSet[int]()
+    assert str(s) == ""
+    assert [] not in s
+    assert [0] not in s
 
-        s.add([1, 2, 3])
-        assert str(s) == textwrap.dedent(
-            """\
-        1
-          2
-            3
-              *"""
-        )
-        s.add([1, 2, 3, 4])
-        assert str(s) == textwrap.dedent(
-            """\
-        1
-          2
-            3
-              *"""
-        )
-        assert [] not in s
-        assert [0] not in s
-        assert [1] not in s
-        assert [1, 2] not in s
-        assert [1, 2, 3] in s
-        assert [1, 2, 3, 3] in s
-        assert (1, 2, 3, 4) in s
-
-        s.add((1, 2))
-        assert str(s) == textwrap.dedent(
-            """\
-        1
-          2
-            *"""
-        )
-        assert [] not in s
-        assert [0] not in s
-        assert [1] not in s
-        assert [1, 2] in s
-        assert [1, 2, 3] in s
-        assert [1, 2, 3, 3] in s
-        assert (1, 2, 3, 4) in s
-
-        s.add([2])
-        assert str(s) == textwrap.dedent(
-            """\
-        1
-          2
-            *
-        2
+    s.add([1, 2, 3])
+    assert str(s) == textwrap.dedent(
+        """\
+    1
+      2
+        3
           *"""
-        )
-        assert [] not in s
-        assert [0] not in s
-        assert [1] not in s
-        assert [2] in s
-        assert [2, 5] in s
+    )
+    s.add([1, 2, 3, 4])
+    assert str(s) == textwrap.dedent(
+        """\
+    1
+      2
+        3
+          *"""
+    )
+    assert [] not in s
+    assert [0] not in s
+    assert [1] not in s
+    assert [1, 2] not in s
+    assert [1, 2, 3] in s
+    assert [1, 2, 3, 3] in s
+    assert (1, 2, 3, 4) in s
 
-        s.add([])
-        assert str(s) == "*"
-        assert [] in s
-        assert [0] in s
-        assert [1] in s
-        assert [5, 6, 7, 8] in s
+    s.add((1, 2))
+    assert str(s) == textwrap.dedent(
+        """\
+    1
+      2
+        *"""
+    )
+    assert [] not in s
+    assert [0] not in s
+    assert [1] not in s
+    assert [1, 2] in s
+    assert [1, 2, 3] in s
+    assert [1, 2, 3, 3] in s
+    assert (1, 2, 3, 4) in s
 
-    @mock.patch("dconf_manager.dconf_dump")
-    @mock.patch("dconf_manager.dconf_write")
-    @mock.patch("dconf_manager.dconf_reset")
-    def _test_main(
-        self,
-        apply: bool,
-        show_ignored: bool,
-        reset: mock.Mock,
-        write: mock.Mock,
-        dump: mock.Mock,
-    ) -> tuple[Sequence[tuple[object, ...]], Sequence[tuple[object, ...]], str]:
-        config = textwrap.dedent(
-            """\
-        [ignored]
-        a=1
-        [overwrite]
-        a=1
-        b=2
-        [clear]
-        keep=5
-        [clear/foo/bar]
-        blah=50
-        [clear/foo/bar/exclude]
-        no=1
-        [clear/food]
-        hi=1
-        """
-        )
-        dump.return_value = config
-        input = os.path.join(os.path.dirname(__file__), "test-data", "input.ini")
-        stdout = io.StringIO()
-        args = [input, "--root", "/the/root"]
-        if show_ignored:
-            args.append("--show-ignored")
-        if apply:
-            args.append("--apply")
-        with mock.patch("sys.stdout", stdout):
-            main(args)
-        dump.assert_called_once_with("/the/root")
+    s.add([2])
+    assert str(s) == textwrap.dedent(
+        """\
+    1
+      2
+        *
+    2
+      *"""
+    )
+    assert [] not in s
+    assert [0] not in s
+    assert [1] not in s
+    assert [2] in s
+    assert [2, 5] in s
 
-        return write.call_args_list, reset.call_args_list, stdout.getvalue()
+    s.add([])
+    assert str(s) == "*"
+    assert [] in s
+    assert [0] in s
+    assert [1] in s
+    assert [5, 6, 7, 8] in s
 
-    def test_diff(self) -> None:
-        writes, resets, stdout = self._test_main(False, False)
-        assert not writes
-        assert not resets
-        assert stdout == EXPECTED_OUTPUT
 
-    def test_diff_with_ignored(self) -> None:
-        writes, resets, stdout = self._test_main(False, True)
-        assert not writes
-        assert not resets
-        assert stdout == EXPECTED_OUTPUT_WITH_IGNORED
+@mock.patch("dconf_manager.dconf_dump")
+@mock.patch("dconf_manager.dconf_write")
+@mock.patch("dconf_manager.dconf_reset")
+def _test_main(
+    apply: bool,
+    show_ignored: bool,
+    reset: mock.Mock,
+    write: mock.Mock,
+    dump: mock.Mock,
+) -> tuple[Sequence[tuple[object, ...]], Sequence[tuple[object, ...]], str]:
+    config = textwrap.dedent(
+        """\
+    [ignored]
+    a=1
+    [overwrite]
+    a=1
+    b=2
+    [clear]
+    keep=5
+    [clear/foo/bar]
+    blah=50
+    [clear/foo/bar/exclude]
+    no=1
+    [clear/food]
+    hi=1
+    """
+    )
+    dump.return_value = config
+    input = os.path.join(os.path.dirname(__file__), "test-data", "input.ini")
+    stdout = io.StringIO()
+    args = [input, "--root", "/the/root"]
+    if show_ignored:
+        args.append("--show-ignored")
+    if apply:
+        args.append("--apply")
+    with mock.patch("sys.stdout", stdout):
+        main(args)
+    dump.assert_called_once_with("/the/root")
 
-    def test_apply(self) -> None:
-        writes, resets, stdout = self._test_main(True, False)
-        assert writes == [
-            mock.call("/the/root/add/AddedKey", "1"),
-            mock.call("/the/root/overwrite/a", "10"),
-            mock.call("/the/root/overwrite/new", "5"),
-        ]
-        assert resets == [
-            mock.call("/the/root/clear/foo/bar/blah"),
-            mock.call("/the/root/overwrite/b"),
-        ]
-        assert stdout == EXPECTED_OUTPUT
+    return write.call_args_list, reset.call_args_list, stdout.getvalue()
+
+
+def test_diff() -> None:
+    writes, resets, stdout = _test_main(False, False)
+    assert not writes
+    assert not resets
+    assert stdout == EXPECTED_OUTPUT
+
+
+def test_diff_with_ignored() -> None:
+    writes, resets, stdout = _test_main(False, True)
+    assert not writes
+    assert not resets
+    assert stdout == EXPECTED_OUTPUT_WITH_IGNORED
+
+
+def test_apply() -> None:
+    writes, resets, stdout = _test_main(True, False)
+    assert writes == [
+        mock.call("/the/root/add/AddedKey", "1"),
+        mock.call("/the/root/overwrite/a", "10"),
+        mock.call("/the/root/overwrite/new", "5"),
+    ]
+    assert resets == [
+        mock.call("/the/root/clear/foo/bar/blah"),
+        mock.call("/the/root/overwrite/b"),
+    ]
+    assert stdout == EXPECTED_OUTPUT
