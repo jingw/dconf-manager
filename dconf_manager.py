@@ -5,8 +5,8 @@ import argparse
 import configparser
 import posixpath
 import subprocess
+from collections.abc import Sequence
 from typing import Generic
-from typing import Sequence
 from typing import TypeVar
 from typing import cast
 
@@ -166,7 +166,7 @@ def main(argv: Sequence[str] | None) -> None:
 
     sections_union = sorted(
         set(dconf_config.keys())
-        | set(k for k in desired_config.keys() if not k.startswith("-"))
+        | {k for k in desired_config.keys() if not k.startswith("-")}
     )
 
     for section in sections_union:

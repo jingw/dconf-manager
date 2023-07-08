@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import io
 import os
-import subprocess
 import textwrap
 import unittest
-from typing import Sequence
+from collections.abc import Sequence
 from unittest import mock
 
 from dconf_manager import HierarchicalSet
@@ -167,19 +166,3 @@ class TestDconfManager(unittest.TestCase):
             mock.call("/the/root/overwrite/b"),
         ]
         assert stdout == EXPECTED_OUTPUT
-
-
-class TestTools(unittest.TestCase):
-    def test_black(self) -> None:
-        subprocess.check_call(["black", "--check", os.path.dirname(__file__)])
-
-    def test_flake8(self) -> None:
-        subprocess.check_call(["flake8"], cwd=os.path.dirname(__file__))
-
-    def test_isort(self) -> None:
-        subprocess.check_call(
-            ["isort", "--check-only", "--diff", os.path.dirname(__file__)]
-        )
-
-    def test_mypy(self) -> None:
-        subprocess.check_call(["mypy", os.path.dirname(__file__)])

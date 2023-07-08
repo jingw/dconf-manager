@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.9]
+        # also see pyupgrade in test_tools.py
+        python-version: [3.11]
 
     steps:
       - uses: actions/checkout@v2
